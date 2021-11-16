@@ -1,0 +1,12 @@
+/node_modules
+
+# Ignore all logfiles and tempfiles.
+/log/*.log
+/log/rspec*.xml
+/log/automation/
+/tmp
+temps
+tempfile
+
+# Ignore bundler config.
+/.bundle
