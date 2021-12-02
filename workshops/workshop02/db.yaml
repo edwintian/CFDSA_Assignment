@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db
+  labels:
+    name: db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: db-pod
+      version: v1
+  template:
+    metadata:
+      labels:
+        name: db-pod
+        version: v1
+      # annotations:
+      #   someKey: someValue  
+    spec:
+      containers:
+      - name: db-container
+        image: stackupiss/bgg-database:v1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: db-port
+          #name shld be 16 chars or less
+          containerPort: 3306
+        # env:
+        #  - name: INSTANCE_NAME
+        #    value: dov-bear
+        #  - name: INSTANCE_HASH
+        #    valueFrom:
+        #     fieldRef:
+        #      fieldPath: metadata.annotations['someKey']
+        # envFrom:
+        # - configMapRef:
+        #     name: dov-cm
+---
+apiVersion: v1
+kind: Service
+# round robin
+metadata:
+  name: db-svc
+  labels:
+    name: db-svc
+spec:
+  # type: LoadBalancer
+  type: ClusterIP
+  selector: 
+    name: db-pod
+    version: v1
+  ports:
+  - name: db-svc-port
+    port: 3306
+    targetPort: db-port
+

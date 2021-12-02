@@ -1,0 +1,15 @@
+# create ns
+
+kubectl apply -f ns.yaml
+
+# create db
+
+kubectl apply -f db.yaml -n bggns
+
+# create db secret to be used by app.yaml
+
+kubectl apply -f db-secret.yaml -n bggns
+
+# create app
+
+kubectl apply -f app.yaml -n bggns

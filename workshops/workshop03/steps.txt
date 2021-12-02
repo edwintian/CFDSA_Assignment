@@ -1,0 +1,16 @@
+
+#Metrics Server and Ingress install
+helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
+helm repo add k8s-as-helm https://ameijer.github.io/k8s-as-helm
+helm repo update
+helm install ingress-nginx ingress-nginx/ingress-nginx -n ingress-nginx 
+helm install metrics-server metrics-server/metrics-server -f values.yaml -n kube-system
+
+#Ingress and PersistentVolumeClaim configuration
+kubectl create ns bggns
+kubectl get storageclass
+kubectl apply -f PVC.yaml -n bggns
+kubectl apply -f db.yaml -n bggns
+kubectl describe pod/dbXXXXXXXX -n bggns
+
+kubectl apply -f app.yaml -n bggns

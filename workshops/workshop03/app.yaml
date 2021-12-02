@@ -1,0 +1,121 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: bgg-app-v1-deploy
+  name: bgg-app-v1-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bgg-app-v1-pod
+  template:
+    metadata:
+      labels:
+        app: bgg-app-v1-pod
+    spec:
+      containers:
+      - image: stackupiss/bgg-backend:v1
+        name: bgg-app-v1
+        args:
+          - --prefix=/v1
+        ports:
+        - containerPort: 3000
+        env:
+         - name: BGG_DB_USER
+           value: root
+         - name: BGG_DB_HOST
+           value: db-svc
+         - name: BGG_DB_PASSWORD
+           value: changeit  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: bgg-app-v1-svc
+  name: bgg-app-v1-svc
+spec:
+  selector:
+    app: bgg-app-v1-pod
+  type: ClusterIP
+  ports:
+  - name: 3000-3000
+    port: 3000
+    protocol: TCP
+    targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: bgg-app-v2-deploy
+  name: bgg-app-v2-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bgg-app-v2-pod
+  template:
+    metadata:
+      labels:
+        app: bgg-app-v2-pod
+    spec:
+      containers:
+      - image: stackupiss/bgg-backend:v2
+        name: bgg-app-v2
+        args:
+          - --prefix=/v2
+        ports:
+        - containerPort: 3000
+        env:
+         - name: BGG_DB_USER
+           value: root
+         - name: BGG_DB_HOST
+           value: db-svc
+         - name: BGG_DB_PASSWORD
+           value: changeit        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: bgg-app-v2-svc
+  name: bgg-app-v2-svc
+spec:
+  selector:
+    app: bgg-app-v2-pod
+  type: ClusterIP
+  ports:
+  - name: 3000-3000
+    port: 3000
+    protocol: TCP
+    targetPort: 3000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bgg-app-ing
+  labels:
+    name: bgg-app-ing
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: bgg-157.230.195.248.nip.io 
+    http:
+      paths:
+      - path: /v2
+        pathType: Prefix
+        backend:
+         service:
+          name: bgg-app-v2-svc
+          port:
+            number: 3000
+      - path: /v1
+        pathType: Prefix
+        backend:
+         service:
+          name: bgg-app-v1-svc
+          port:
+            number: 3000

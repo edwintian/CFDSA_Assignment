@@ -1,0 +1,1 @@
+Encrypt secret using kubeseal and deploy secrets.yaml before sourcing DB password from secrets resource
